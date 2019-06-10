@@ -3,12 +3,12 @@
  * @flow
  */
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity, Text} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Text, Platform, PermissionsAndroid, Image} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 import {inject, observer} from "mobx-react";
-import {observable, action} from "mobx";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
+import Geolocation from 'react-native-geolocation-service';
 
 type Props = {
     kickgoingScooterStore: KickgoingScooterStore,
@@ -39,6 +39,10 @@ const styles = StyleSheet.create({
     },
     searchButtonContainer: {
         height: 40
+    },
+    markerImage: {
+        width: 30,
+        height: 30,
     }
 });
 
@@ -48,8 +52,24 @@ class Map extends React.Component<Props> {
     mapView: MapView;
     isLoaded = false;
 
-    componentDidMount() {
-        navigator.geolocation.watchPosition((coord) => {
+    async componentDidMount() {
+        if (Platform.OS === 'android') {
+            const granted = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION );
+
+            if (!granted) {
+                const res = await PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION, {
+                    title: '위치정보 권한 요청',
+                    message: '지도를 표시하기 위해 위치정보가 필요합니다.'
+                });
+
+                if (res !== "granted") {
+                    alert('위치정보 권한이 허용되지 않아 위치를 확인 할 수 없습니다.');
+                    return;
+                }
+            }
+        }
+
+        Geolocation.watchPosition((coord) => {
             console.log('watchPos', coord);
             this.mapView.setCamera({
                 center: {
@@ -62,7 +82,7 @@ class Map extends React.Component<Props> {
                 this.fetch();
             }
         }, (error) => {
-            console.log('error');
+            console.log('error', error);
         }, {
             enableHighAccuracy: true,
             distanceFilter: 10,
@@ -71,7 +91,7 @@ class Map extends React.Component<Props> {
     }
 
     componentWillDestroy() {
-        navigator.geolocation.clearWatch();
+        Geolocation.clearWatch();
     }
 
     fetch = () => {
@@ -92,8 +112,8 @@ class Map extends React.Component<Props> {
     };
 
     render() {
-        console.log('scooters', this.props.kickgoingScooterStore.scooters);
-        console.log('gogoxingScooters', this.props.gogoxingScooterStore.scooters);
+        // console.log('scooters', this.props.kickgoingScooterStore.scooters);
+        // console.log('gogoxingScooters', this.props.gogoxingScooterStore.scooters);
         return (
             <View style={styles.container}>
                 <View style={styles.mapContainer}>
@@ -107,14 +127,18 @@ class Map extends React.Component<Props> {
                         {this.props.kickgoingScooterStore.scooters.map((scooter, index) => (
                             <Marker title="kickgoing"
                                     coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                    icon={require('./resource/icons/kickgoing_small.png')}
-                                    key={`kickgoing-${index}`} />
+                                    key={`kickgoing-${index}`}>
+                                <Image source={require('./resource/icons/kickgoing_small.png')}
+                                       style={styles.markerImage}/>
+                            </Marker>
                         ))}
                         {this.props.gogoxingScooterStore.scooters.map((scooter, index) => (
                             <Marker title="gogossing"
                                     coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                    icon={require('./resource/icons/gogoxing_created.png')}
-                                    key={`gogoxing-${index}`}/>
+                                    key={`gogoxing-${index}`}>
+                                <Image source={require('./resource/icons/gogoxing_created.png')}
+                                       style={styles.markerImage} />
+                            </Marker>
                         ))}
                     </MapView>
                 </View>

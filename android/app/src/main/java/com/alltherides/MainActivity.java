@@ -1,4 +1,4 @@
-package com.app;
+package com.alltherides;
 
 import com.facebook.react.ReactActivity;
 
