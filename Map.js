@@ -6,13 +6,19 @@ import React from 'react';
 import {StyleSheet, View, TouchableOpacity, Text, Platform, PermissionsAndroid, Image} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 import {inject, observer} from "mobx-react";
+import Geolocation from 'react-native-geolocation-service';
+import {CombinedScooterStore} from "./stores/CombinedScooterStore";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
-import Geolocation from 'react-native-geolocation-service';
+import {XingxingScooterStore} from "./stores/XingxingScooterStore";
+import {SpatialIndexStore} from "./stores/SpatialIndexStore";
 
 type Props = {
+    combinedScooterStore: CombinedScooterStore,
     kickgoingScooterStore: KickgoingScooterStore,
     gogoxingScooterStore: GogoxingScooterStore,
+    xingxingScooterStore: XingxingScooterStore,
+    spatialIndexStore: SpatialIndexStore,
 };
 
 const styles = StyleSheet.create({
@@ -46,11 +52,12 @@ const styles = StyleSheet.create({
     }
 });
 
-@inject('kickgoingScooterStore', 'gogoxingScooterStore')
+@inject('combinedScooterStore', 'kickgoingScooterStore', 'gogoxingScooterStore', 'xingxingScooterStore', 'spatialIndexStore')
 @observer
 class Map extends React.Component<Props> {
     mapView: MapView;
     isLoaded = false;
+    markerImages = {};
 
     async componentDidMount() {
         if (Platform.OS === 'android') {
@@ -75,12 +82,9 @@ class Map extends React.Component<Props> {
                 center: {
                     latitude: coord.coords.latitude,
                     longitude: coord.coords.longitude,
-                }
+                },
+                zoom: 17,
             });
-
-            if (!this.isLoaded) {
-                this.fetch();
-            }
         }, (error) => {
             console.log('error', error);
         }, {
@@ -88,9 +92,13 @@ class Map extends React.Component<Props> {
             distanceFilter: 10,
             useSignificantChanges: true,
         });
+
+        this.props.combinedScooterStore.scooterStores.forEach(scooterStore => {
+            this.markerImages[scooterStore.getIdentifier()] = (<Image source={scooterStore.getMarkerIcon()} style={styles.markerImage} />);
+        });
     }
 
-    componentWillDestroy() {
+    componentWillUmmount() {
         Geolocation.clearWatch();
     }
 
@@ -98,6 +106,7 @@ class Map extends React.Component<Props> {
         this.mapView.getCamera().then((camera) => {
             console.log('camera', camera);
             this.props.kickgoingScooterStore.fetch(camera.center.latitude, camera.center.longitude, camera.zoom);
+            this.props.xingxingScooterStore.fetch(camera.center.latitude, camera.center.longitude, camera.zoom);
         });
 
         this.mapView.getMapBoundaries().then(boundaries => {
@@ -111,7 +120,32 @@ class Map extends React.Component<Props> {
         });
     };
 
+    handleRegionChange = async region => {
+        // console.log('regionChange');
+        // console.log('region', region);
+        // console.log('map boundaries', await this.mapView.getMapBoundaries());
+        if (this._regionChangeDebounceTimer) {
+            clearTimeout(this._regionChangeDebounceTimer);
+            this._regionChangeDebounceTimer = null;
+        }
+
+        this._regionChangeDebounceTimer = setTimeout(async () => {
+            const boundary = await this.mapView.getMapBoundaries();
+
+            this.props.spatialIndexStore.setCurrentBoundary({
+                swLat: boundary.southWest.latitude,
+                swLng: boundary.southWest.longitude,
+                neLat: boundary.northEast.latitude,
+                neLng: boundary.northEast.longitude
+            });
+
+            this._regionChangeDebounceTimer = null;
+        }, 100);
+
+    };
+
     render() {
+        // console.log('render', this.props.combinedScooterStore.combinedScooters);
         // console.log('scooters', this.props.kickgoingScooterStore.scooters);
         // console.log('gogoxingScooters', this.props.gogoxingScooterStore.scooters);
         return (
@@ -123,23 +157,24 @@ class Map extends React.Component<Props> {
                              maxZoomLevel={20}
                              showsUserLocation={true}
                              zoomEnabled={true}
+                             zoomControlEnabled={true}
+                             onRegionChange={this.handleRegionChange}
                              ref={ref => this.mapView = ref}>
-                        {this.props.kickgoingScooterStore.scooters.map((scooter, index) => (
-                            <Marker title="kickgoing"
+                        {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
+                            <Marker title={scooter.providerName}
                                     coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                    key={`kickgoing-${index}`}>
-                                <Image source={require('./resource/icons/kickgoing_small.png')}
-                                       style={styles.markerImage}/>
-                            </Marker>
+                                    key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}
+                                    image={scooter.markerIcon}
+                                    stopPropagation={true} />
                         ))}
-                        {this.props.gogoxingScooterStore.scooters.map((scooter, index) => (
-                            <Marker title="gogossing"
-                                    coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                    key={`gogoxing-${index}`}>
-                                <Image source={require('./resource/icons/gogoxing_created.png')}
-                                       style={styles.markerImage} />
-                            </Marker>
-                        ))}
+                        {/*{this.props.combinedScooterStore.combinedScooters.map((scooter) => (*/}
+                        {/*    <Marker title={scooter.providerName}*/}
+                        {/*            coordinate={{latitude: scooter.lat, longitude: scooter.lng}}*/}
+                        {/*            key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}*/}
+                        {/*            stopPropagation={true}>*/}
+                        {/*        {this.markerImages[scooter.providerIdentifier]}*/}
+                        {/*    </Marker>*/}
+                        {/*))}*/}
                     </MapView>
                 </View>
                 <View style={styles.searchButtonContainer}>

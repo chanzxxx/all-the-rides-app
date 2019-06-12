@@ -3,8 +3,7 @@ import {observable, action} from "mobx";
 import axios from 'axios';
 
 type GogoxingScooter = Scooter & {
-    batteryLevel: number,
-    serialNumber: string
+
 };
 
 export class GogoxingScooterStore implements ScooterStoreInterface {
@@ -42,6 +41,18 @@ export class GogoxingScooterStore implements ScooterStoreInterface {
 
     @action
     setScooters(scooters) {
-        this.scooters = scooters;
+        this.scooters.replace(scooters);
+    }
+
+    getIdentifier() {
+        return 'gogoxing';
+    }
+
+    getName() {
+        return '고고씽';
+    }
+
+    getMarkerIcon() {
+        return require('../resource/icons/gogoxing_resize.png');
     }
 }

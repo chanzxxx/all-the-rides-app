@@ -7,9 +7,6 @@ import {observable, action} from "mobx";
 import axios from 'axios';
 
 type KickgoingScooter = Scooter & {
-    id: number,
-    serialNumber: string,
-    batteryLevel: number,
 }
 
 export class KickgoingScooterStore implements ScooterStoreInterface {
@@ -33,13 +30,26 @@ export class KickgoingScooterStore implements ScooterStoreInterface {
                 batteryLevel: item.battery_rate,
                 lat: item.lat,
                 lng: item.lng,
-                id: item.id
+                // id: item.id
             })));
         });
     }
 
     @action
     setScooters(scooters) {
-        this.scooters = scooters;
+        console.log('setScooters');
+        this.scooters.replace(scooters);
+    }
+
+    getIdentifier() {
+        return 'kickgoing';
+    }
+
+    getName() {
+        return '킥고잉';
+    }
+
+    getMarkerIcon() {
+        return require('../resource/icons/kickgoing_resize.png');
     }
 }
