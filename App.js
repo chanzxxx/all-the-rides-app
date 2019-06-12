@@ -9,12 +9,15 @@
 import React, {Component} from 'react';
 import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
 import Map from './Map';
-import {Provider} from "mobx-react";
+import {InnerSideMenu} from "./components/InnerSideMenu";
+import SideMenu from 'react-native-side-menu';
+import {observer, Provider} from "mobx-react";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
 import {CombinedScooterStore} from "./stores/CombinedScooterStore";
 import {XingxingScooterStore} from "./stores/XingxingScooterStore";
 import {SpatialIndexStore} from "./stores/SpatialIndexStore";
+import {observable, action} from "mobx";
 
 
 const kickgoingScooterStore = new KickgoingScooterStore();
@@ -25,7 +28,23 @@ const spatialIndexStore = new SpatialIndexStore(combinedScooterStore);
 
 type Props = {};
 
-export default class App extends Component<Props> {
+
+
+@observer
+class App extends Component<Props> {
+  @observable isMenuOpen = false;
+
+  @action
+  toggleMenu = () => {
+    this.isMenuOpen = !this.isMenuOpen;
+    console.log('isMenuOpen', this.isMenuOpen);
+  };
+
+  @action
+  setMenuOpen = (b) => {
+    this.isMenuOpen = b;
+  };
+
   render() {
     return (
         <Provider combinedScooterStore={combinedScooterStore}
@@ -33,21 +52,26 @@ export default class App extends Component<Props> {
                   gogoxingScooterStore={gogoxingScooterStore}
                   xingxingScooterStore={xingxingScooterStore}
                   spatialIndexStore={spatialIndexStore}>
-          <View style={styles.appContainer}>
-            <View style={styles.header}>
-              <View style={styles.headerLeft}>
-                <TouchableOpacity>
-                  <Image source={require('./resource/ui/menu.png')} style={styles.menuIcon} />
-                </TouchableOpacity>
+          <SideMenu menu={(<InnerSideMenu/>)}
+                    isOpen={this.isMenuOpen}
+                    onChange={this.setMenuOpen}
+                    disableGestures={true} >
+            <View style={styles.appContainer}>
+              <View style={styles.header}>
+                <View style={styles.headerLeft}>
+                  <TouchableOpacity onPress={this.toggleMenu}>
+                    <Image source={require('./resource/ui/menu.png')} style={styles.menuIcon} />
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.headerCenter}>
+                  <Text style={styles.headerText}>전국 킥보드 지도</Text>
+                </View>
               </View>
-              <View style={styles.headerCenter}>
-                <Text style={styles.headerText}>전국 킥보드 지도</Text>
+              <View style={styles.mapContainer}>
+                <Map/>
               </View>
             </View>
-            <View style={styles.mapContainer}>
-              <Map/>
-            </View>
-          </View>
+          </SideMenu>
         </Provider>
     );
   }
@@ -98,3 +122,5 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   },
 });
+
+export default App;

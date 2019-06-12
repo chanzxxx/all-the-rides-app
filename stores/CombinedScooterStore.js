@@ -1,5 +1,5 @@
 import type {Scooter, ScooterStoreInterface} from "./ScooterStoreInterface";
-import {observable, observe, action} from "mobx";
+import {observable, observe, action, computed} from "mobx";
 import KDBush from 'kdbush';
 
 type CombinedScooter = Scooter & {
@@ -54,6 +54,10 @@ export class CombinedScooterStore {
     @action
     computeScooters() {
         this.combinedScooters.replace(this.combineScooters());
+    }
+
+    @computed get isFetching() {
+        return this.scooterStores.some(store => store.isFetching);
     }
 
 

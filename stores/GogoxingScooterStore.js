@@ -8,6 +8,11 @@ type GogoxingScooter = Scooter & {
 
 export class GogoxingScooterStore implements ScooterStoreInterface {
     @observable scooters : GogoxingScooter[] = [];
+    @observable isFetching: boolean = false;
+
+    @action setFetching(b) {
+        this.isFetching = b;
+    }
 
     fetch(latSW, lngSW, latNE, lngNE) {
         const form = new FormData();
@@ -17,6 +22,8 @@ export class GogoxingScooterStore implements ScooterStoreInterface {
         form.append('lngSW', lngSW);
         form.append('latNE', latNE);
         form.append('lngNE', lngNE);
+
+        this.setFetching(true);
         // todo: lat, lon, zoomLevel 로 bounding box의 북동쪽 남서쪽 좌표를 구해야함
         return axios.post('https://api.gogo-ssing.com/ss/api/mob/search.do', form, {
             headers: {
@@ -36,6 +43,8 @@ export class GogoxingScooterStore implements ScooterStoreInterface {
             })));
         }).catch(error => {
             console.log('error', error);
+        }).finally(() => {
+            this.setFetching(false);
         });
     }
 
@@ -53,6 +62,18 @@ export class GogoxingScooterStore implements ScooterStoreInterface {
     }
 
     getMarkerIcon() {
-        return require('../resource/icons/gogoxing_resize.png');
+        return require('../resource/icons/marker/gogoxing_resize.png');
+    }
+
+    getAppIcon() {
+        return require('../resource/icons/app-icons/gogoxing.png');
+    }
+
+    getAppInfo() {
+        return {
+            android: {
+                packageName: 'com.trianglewide.sbike'
+            }
+        }
     }
 }

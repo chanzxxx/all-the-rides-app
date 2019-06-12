@@ -2,14 +2,20 @@
  * @flow
  */
 
-import type {Scooter, ScooterStoreInterface} from "./ScooterStoreInterface";
+import type {AppInfo, Scooter, ScooterStoreInterface} from "./ScooterStoreInterface";
 import {observable, action} from "mobx";
 import axios from "axios";
 
 export class XingxingScooterStore implements ScooterStoreInterface {
     @observable scooters: Scooter[] = [];
+    @observable isFetching = false;
+
+    @action setFetching(b) {
+        this.isFetching = b;
+    }
 
     fetch(lat, lng, zoomLevel) {
+        this.setFetching(true);
         return axios.get('https://api.honeybees.co.kr/api-xingxing/v1/scootersforapp', {
             params: {
                 latitude: lat,
@@ -27,6 +33,8 @@ export class XingxingScooterStore implements ScooterStoreInterface {
                 serialNumber: raw._id,
                 batteryLevel: raw.deviceStatus.battery
             })));
+        }).finally(() => {
+            this.setFetching(false);
         });
     }
 
@@ -40,10 +48,28 @@ export class XingxingScooterStore implements ScooterStoreInterface {
     }
 
     getMarkerIcon() {
-        return require('../resource/icons/xingxing_resize.png');
+        return require('../resource/icons/marker/xingxing_resize.png');
     }
 
     getName() {
         return '씽씽';
+    }
+
+    getAppIcon() {
+        return require('../resource/icons/app-icons/xingxing.png');
+    }
+
+    getAppInfo(): AppInfo {
+        return {
+            ios: {
+                appName: '씽씽-라이프-모빌리티',
+                appStoreId: 1460221520,
+                appStoreLocale: 'kr',
+                bundleIdentifier: ''
+            },
+            android: {
+                packageName: 'com.xingxingapp'
+            }
+        }
     }
 }

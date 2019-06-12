@@ -11,11 +11,19 @@ type KickgoingScooter = Scooter & {
 
 export class KickgoingScooterStore implements ScooterStoreInterface {
     @observable scooters: KickgoingScooter[] = [];
+    @observable isFetching = false;
+
+    @action
+    setFetching(b) {
+        this.isFetching = b;
+    }
 
     fetch(lat: number, lng: number, zoomLevel: number) {
         console.log('fetch', {
             lat,lng,zoomLevel
         });
+
+        this.setFetching(true);
 
         return axios.get('https://api.kickgoing.io/v2/kickscooters/ready/list', {
             params: {
@@ -32,6 +40,8 @@ export class KickgoingScooterStore implements ScooterStoreInterface {
                 lng: item.lng,
                 // id: item.id
             })));
+        }).finally(() => {
+            this.setFetching(false);
         });
     }
 
@@ -50,6 +60,18 @@ export class KickgoingScooterStore implements ScooterStoreInterface {
     }
 
     getMarkerIcon() {
-        return require('../resource/icons/kickgoing_resize.png');
+        return require('../resource/icons/marker/kickgoing_resize.png');
+    }
+
+    getAppIcon() {
+        return require('../resource/icons/app-icons/kickgoing.png');
+    }
+
+    getAppInfo() {
+        return {
+            android: {
+                packageName: 'com.olulo.kickgoing'
+            }
+        }
     }
 }

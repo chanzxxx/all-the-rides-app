@@ -3,9 +3,10 @@
  * @flow
  */
 import React from 'react';
-import {StyleSheet, View, TouchableOpacity, Text, Platform, PermissionsAndroid, Image} from 'react-native';
+import {StyleSheet, View, TouchableOpacity, Text, Platform, PermissionsAndroid, Image, ActivityIndicator} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 import {inject, observer} from "mobx-react";
+import {observable, action} from "mobx";
 import Geolocation from 'react-native-geolocation-service';
 import {CombinedScooterStore} from "./stores/CombinedScooterStore";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
@@ -23,7 +24,6 @@ type Props = {
 
 const styles = StyleSheet.create({
     map: {
-        ...StyleSheet.absoluteFillObject
     },
     container: {
         display: 'flex',
@@ -44,7 +44,9 @@ const styles = StyleSheet.create({
         color: '#ffffff',
     },
     searchButtonContainer: {
-        height: 40
+        height: 40,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     markerImage: {
         width: 30,
@@ -58,6 +60,10 @@ class Map extends React.Component<Props> {
     mapView: MapView;
     isLoaded = false;
     markerImages = {};
+
+    @observable mapCustomStyle = {
+        flex: 0
+    };
 
     async componentDidMount() {
         if (Platform.OS === 'android') {
@@ -144,6 +150,33 @@ class Map extends React.Component<Props> {
 
     };
 
+    renderSearchButton() {
+        if (!this.props.combinedScooterStore.isFetching) {
+            return (
+                <TouchableOpacity style={styles.searchButton} onPress={this.fetch}>
+                    <Text style={styles.searchButtonText}>여기서 검색</Text>
+                </TouchableOpacity>
+            )
+        } else {
+            return (
+                <ActivityIndicator size="large" />
+            )
+        }
+    }
+
+    // 맵에 현재 사용자 위치로 찾아가기 버튼과 확대 축소 버튼이 표시 안되는 문제 해결 위해
+    // 강제로 재 랜더링 시킴
+    // see: https://github.com/react-native-community/react-native-maps/issues/2010
+    forceMapRerender = () => {
+        this.setMapCustomStyle();
+    };
+
+    @action setMapCustomStyle() {
+        this.mapCustomStyle = {
+            flex: 1
+        };
+    }
+
     render() {
         // console.log('render', this.props.combinedScooterStore.combinedScooters);
         // console.log('scooters', this.props.kickgoingScooterStore.scooters);
@@ -152,13 +185,15 @@ class Map extends React.Component<Props> {
             <View style={styles.container}>
                 <View style={styles.mapContainer}>
                     <MapView provider={PROVIDER_GOOGLE}
-                             style={styles.map}
+                             style={[styles.map, {...this.mapCustomStyle}]}
                              minZoomLevel={15}
                              maxZoomLevel={20}
                              showsUserLocation={true}
                              zoomEnabled={true}
                              zoomControlEnabled={true}
                              onRegionChange={this.handleRegionChange}
+                             showsMyLocationButton={true}
+                             onMapReady={this.forceMapRerender}
                              ref={ref => this.mapView = ref}>
                         {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
                             <Marker title={scooter.providerName}
@@ -178,9 +213,7 @@ class Map extends React.Component<Props> {
                     </MapView>
                 </View>
                 <View style={styles.searchButtonContainer}>
-                    <TouchableOpacity style={styles.searchButton} onPress={this.fetch}>
-                        <Text style={styles.searchButtonText}>여기서 검색</Text>
-                    </TouchableOpacity>
+                    {this.renderSearchButton()}
                 </View>
             </View>
         );
