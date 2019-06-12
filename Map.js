@@ -24,6 +24,7 @@ type Props = {
 
 const styles = StyleSheet.create({
     map: {
+        flex: 1,
     },
     container: {
         display: 'flex',
@@ -57,14 +58,19 @@ const styles = StyleSheet.create({
 @inject('combinedScooterStore', 'kickgoingScooterStore', 'gogoxingScooterStore', 'xingxingScooterStore', 'spatialIndexStore')
 @observer
 class Map extends React.Component<Props> {
+    @observable showMap = false;
+
     mapView: MapView;
     isLoaded = false;
     markerImages = {};
 
     @observable mapCustomStyle = {
-        flex: 0
+        marginBottom: 1,
     };
 
+    @action setShowMap(b = true) {
+        this.showMap = b;
+    }
     async componentDidMount() {
         if (Platform.OS === 'android') {
             const granted = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION );
@@ -75,15 +81,24 @@ class Map extends React.Component<Props> {
                     message: '지도를 표시하기 위해 위치정보가 필요합니다.'
                 });
 
+                this.setShowMap(true);
+
                 if (res !== "granted") {
                     alert('위치정보 권한이 허용되지 않아 위치를 확인 할 수 없습니다.');
                     return;
                 }
+            } else {
+                this.setShowMap(true);
             }
         }
 
         Geolocation.watchPosition((coord) => {
             console.log('watchPos', coord);
+
+            if (!this.mapView) {
+                return;
+            }
+
             this.mapView.setCamera({
                 center: {
                     latitude: coord.coords.latitude,
@@ -167,13 +182,31 @@ class Map extends React.Component<Props> {
     // 맵에 현재 사용자 위치로 찾아가기 버튼과 확대 축소 버튼이 표시 안되는 문제 해결 위해
     // 강제로 재 랜더링 시킴
     // see: https://github.com/react-native-community/react-native-maps/issues/2010
-    forceMapRerender = () => {
+    forceMapRerender() {
         this.setMapCustomStyle();
+    }
+
+    setInitialCamera() {
+        Geolocation.getCurrentPosition(pos => {
+            console.log('this.mapView', this.mapView);
+            this.mapView.setCamera({
+                center: {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                },
+                zoom: 18 // initial zoom level
+            });
+        });
+    }
+
+    onMapReady = () => {
+        this.forceMapRerender();
+        this.setInitialCamera();
     };
 
     @action setMapCustomStyle() {
         this.mapCustomStyle = {
-            flex: 1
+            marginBottom: 0
         };
     }
 
@@ -184,7 +217,8 @@ class Map extends React.Component<Props> {
         return (
             <View style={styles.container}>
                 <View style={styles.mapContainer}>
-                    <MapView provider={PROVIDER_GOOGLE}
+                    {this.showMap && (
+                        <MapView provider={PROVIDER_GOOGLE}
                              style={[styles.map, {...this.mapCustomStyle}]}
                              minZoomLevel={15}
                              maxZoomLevel={20}
@@ -193,15 +227,15 @@ class Map extends React.Component<Props> {
                              zoomControlEnabled={true}
                              onRegionChange={this.handleRegionChange}
                              showsMyLocationButton={true}
-                             onMapReady={this.forceMapRerender}
+                             onMapReady={this.onMapReady}
                              ref={ref => this.mapView = ref}>
-                        {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
-                            <Marker title={scooter.providerName}
-                                    coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                    key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}
-                                    image={scooter.markerIcon}
-                                    stopPropagation={true} />
-                        ))}
+                            {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
+                                <Marker title={scooter.providerName}
+                                        coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
+                                        key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}
+                                        image={scooter.markerIcon}
+                                        stopPropagation={true} />
+                            ))}
                         {/*{this.props.combinedScooterStore.combinedScooters.map((scooter) => (*/}
                         {/*    <Marker title={scooter.providerName}*/}
                         {/*            coordinate={{latitude: scooter.lat, longitude: scooter.lng}}*/}
@@ -210,12 +244,13 @@ class Map extends React.Component<Props> {
                         {/*        {this.markerImages[scooter.providerIdentifier]}*/}
                         {/*    </Marker>*/}
                         {/*))}*/}
-                    </MapView>
+                        </MapView>
+                    )}
+                    </View>
+                    <View style={styles.searchButtonContainer}>
+                        {this.renderSearchButton()}
+                    </View>
                 </View>
-                <View style={styles.searchButtonContainer}>
-                    {this.renderSearchButton()}
-                </View>
-            </View>
         );
     }
 }
