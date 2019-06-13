@@ -8,12 +8,10 @@
   },
   "dependencies": {
     "axios": "^0.19.0",
-    "kdbush": "^3.0.0",
     "mobx": "^5.10.0",
     "mobx-react": "^5.4.4",
     "react": "16.8.3",
     "react-native": "0.59.9",
-    "react-native-app-link": "^1.0.0",
     "react-native-geolocation-service": "^2.0.1",
     "react-native-maps": "^0.24.2",
     "react-native-send-intent": "^1.0.30",
