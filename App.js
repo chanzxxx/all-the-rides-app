@@ -36,6 +36,9 @@ type Props = {};
 class App extends Component<Props> {
   @observable isMenuOpen = false;
 
+  componentDidMount() {
+    console.disableYellowBox = true;
+  }
 
   toggleMenu = () => {
     this.setMenuOpen(!this.isMenuOpen);
