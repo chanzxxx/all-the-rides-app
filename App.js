@@ -34,14 +34,21 @@ type Props = {};
 class App extends Component<Props> {
   @observable isMenuOpen = false;
 
-  @action
+
   toggleMenu = () => {
-    this.isMenuOpen = !this.isMenuOpen;
+    this.setMenuOpen(!this.isMenuOpen);
     console.log('isMenuOpen', this.isMenuOpen);
+  };
+
+  onChangeSideMenu = b => {
+    if (b !== this.isMenuOpen) {
+      this.setMenuOpen(b);
+    }
   };
 
   @action
   setMenuOpen = (b) => {
+    console.log('setMenuOpen', b);
     this.isMenuOpen = b;
   };
 
@@ -54,7 +61,7 @@ class App extends Component<Props> {
                   spatialIndexStore={spatialIndexStore}>
           <SideMenu menu={(<InnerSideMenu/>)}
                     isOpen={this.isMenuOpen}
-                    onChange={this.setMenuOpen}
+                    onChange={this.onChangeSideMenu}
                     disableGestures={true} >
             <View style={styles.appContainer}>
               <View style={styles.header}>
@@ -64,7 +71,7 @@ class App extends Component<Props> {
                   </TouchableOpacity>
                 </View>
                 <View style={styles.headerCenter}>
-                  <Text style={styles.headerText}>전국 킥보드 지도</Text>
+                  <Text style={styles.headerText}>공유 킥보드 지도</Text>
                 </View>
               </View>
               <View style={styles.mapContainer}>

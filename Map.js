@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
     },
     searchButton: {
         width: '100%',
-        backgroundColor: '#000000',
+        backgroundColor: '#25282A',
         flex: 1,
         alignItems: 'center',
         justifyContent: 'center'
@@ -59,9 +59,18 @@ const styles = StyleSheet.create({
 @observer
 class Map extends React.Component<Props> {
     @observable showMap = false;
+    @observable initialCamera = {
+        center: {
+            latitude: 0,
+            longitude: 0
+        },
+        pitch: 0,
+        heading: 0,
+        zoom: 18,
+        altitude: 1000,
+    };
 
     mapView: MapView;
-    isLoaded = false;
     markerImages = {};
 
     @observable mapCustomStyle = {
@@ -71,6 +80,20 @@ class Map extends React.Component<Props> {
     @action setShowMap(b = true) {
         this.showMap = b;
     }
+
+    @action
+    setInitialCameraObject(camera) {
+        this.initialCamera = {
+            center: {
+                ...camera.center
+            },
+            pitch: camera.pitch,
+            heading: camera.heading,
+            zoom: camera.zoom,
+            altitude: 1000,
+        };
+    }
+
     async componentDidMount() {
         if (Platform.OS === 'android') {
             const granted = await PermissionsAndroid.check( PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION );
@@ -95,7 +118,16 @@ class Map extends React.Component<Props> {
         Geolocation.watchPosition((coord) => {
             console.log('watchPos', coord);
 
-            if (!this.mapView) {
+            if (!this.mapView && !this.initialCamera) {
+                this.setInitialCameraObject({
+                    center: {
+                        latitude: coord.coords.latitude,
+                        longitude: coord.coords.longitude,
+                    },
+                    pitch: 0,
+                    zoom: 18,
+                });
+
                 return;
             }
 
@@ -104,7 +136,7 @@ class Map extends React.Component<Props> {
                     latitude: coord.coords.latitude,
                     longitude: coord.coords.longitude,
                 },
-                zoom: 17,
+                zoom: 18,
             });
         }, (error) => {
             console.log('error', error);
@@ -120,7 +152,7 @@ class Map extends React.Component<Props> {
     }
 
     componentWillUmmount() {
-        Geolocation.clearWatch();
+        // Geolocation.clearWatch();
     }
 
     fetch = () => {
@@ -188,6 +220,7 @@ class Map extends React.Component<Props> {
 
     setInitialCamera() {
         Geolocation.getCurrentPosition(pos => {
+            console.log('pos', pos);
             console.log('this.mapView', this.mapView);
             this.mapView.setCamera({
                 center: {
@@ -200,8 +233,9 @@ class Map extends React.Component<Props> {
     }
 
     onMapReady = () => {
+        console.log('onMapReady');
         this.forceMapRerender();
-        this.setInitialCamera();
+        // this.setInitialCamera();
     };
 
     @action setMapCustomStyle() {
@@ -219,23 +253,26 @@ class Map extends React.Component<Props> {
                 <View style={styles.mapContainer}>
                     {this.showMap && (
                         <MapView provider={PROVIDER_GOOGLE}
-                             style={[styles.map, {...this.mapCustomStyle}]}
-                             minZoomLevel={15}
-                             maxZoomLevel={20}
-                             showsUserLocation={true}
-                             zoomEnabled={true}
-                             zoomControlEnabled={true}
-                             onRegionChange={this.handleRegionChange}
-                             showsMyLocationButton={true}
-                             onMapReady={this.onMapReady}
-                             ref={ref => this.mapView = ref}>
-                            {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
-                                <Marker title={scooter.providerName}
-                                        coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
-                                        key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}
-                                        image={scooter.markerIcon}
-                                        stopPropagation={true} />
-                            ))}
+                                 initialCamera={{...this.initialCamera, center: {
+                                     ...this.initialCamera.center
+                                 }}}
+                                 style={[styles.map, {...this.mapCustomStyle}]}
+                                 minZoomLevel={15}
+                                 maxZoomLevel={20}
+                                 showsUserLocation={true}
+                                 zoomEnabled={true}
+                                 zoomControlEnabled={true}
+                                 onRegionChange={this.handleRegionChange}
+                                 showsMyLocationButton={true}
+                                 onMapReady={this.onMapReady}
+                                 ref={ref => this.mapView = ref}>
+                                {this.props.spatialIndexStore.scootersInBoundary.map(scooter => (
+                                    <Marker title={scooter.providerName}
+                                            coordinate={{latitude: scooter.lat, longitude: scooter.lng}}
+                                            key={`${scooter.providerIdentifier}-${scooter.serialNumber}`}
+                                            image={scooter.markerIcon}
+                                            stopPropagation={true} />
+                                ))}
                         {/*{this.props.combinedScooterStore.combinedScooters.map((scooter) => (*/}
                         {/*    <Marker title={scooter.providerName}*/}
                         {/*            coordinate={{latitude: scooter.lat, longitude: scooter.lng}}*/}
@@ -244,13 +281,13 @@ class Map extends React.Component<Props> {
                         {/*        {this.markerImages[scooter.providerIdentifier]}*/}
                         {/*    </Marker>*/}
                         {/*))}*/}
-                        </MapView>
-                    )}
+                            </MapView>
+                        )}
+                        </View>
+                        <View style={styles.searchButtonContainer}>
+                            {this.renderSearchButton()}
+                        </View>
                     </View>
-                    <View style={styles.searchButtonContainer}>
-                        {this.renderSearchButton()}
-                    </View>
-                </View>
         );
     }
 }
