@@ -1,5 +1,4 @@
 import {CombinedScooterStore} from "./CombinedScooterStore";
-import KDBush from "kdbush";
 import {computed, observable, action} from "mobx";
 import type {Scooter} from "./ScooterStoreInterface";
 

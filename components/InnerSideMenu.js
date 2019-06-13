@@ -46,6 +46,39 @@ const styles = StyleSheet.create({
     appIcon: {
         width: 40,
         height: 40
+    },
+
+    bottom: {
+        height: 40,
+        marginBottom: 10,
+        paddingRight: 10,
+    },
+
+    inquiryButton: {
+        marginBottom: 10,
+        flexDirection: 'row',
+        justifyContent: 'center',
+        // justifyContent: 'center',
+        alignItems: 'center',
+    },
+
+    inquiryButtonText: {
+        color: '#999999'
+    },
+
+    inquiryTextBox: {
+        marginLeft: 5
+    },
+
+    materialIconBox: {
+        width: 40,
+        height: 30,
+        paddingLeft: 10
+    },
+
+    materialIcon: {
+        width: 30,
+        height: 30
     }
 });
 
@@ -71,6 +104,10 @@ class InnerSideMenu extends React.Component<Props> {
         }
     }
 
+    openMail = () => {
+        Linking.openURL('mailto:alltheridesapp@gmail.com');
+    };
+
     render() {
         return (
             <View style={styles.container}>
@@ -93,7 +130,16 @@ class InnerSideMenu extends React.Component<Props> {
                             </View>
                         ))
                     }
-
+                </View>
+                <View style={styles.bottom}>
+                    <TouchableOpacity style={styles.inquiryButton} onPress={this.openMail}>
+                        <View style={styles.materialIconBox}>
+                            <Image source={require('../resource/ui/email.png')} style={styles.materialIcon}/>
+                        </View>
+                        <View style={styles.inquiryTextBox}>
+                            <Text style={styles.inquiryButtonText}>문의하기</Text>
+                        </View>
+                    </TouchableOpacity>
                 </View>
             </View>
         )

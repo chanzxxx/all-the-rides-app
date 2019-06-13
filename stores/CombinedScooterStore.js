@@ -1,6 +1,5 @@
 import type {Scooter, ScooterStoreInterface} from "./ScooterStoreInterface";
 import {observable, observe, action, computed} from "mobx";
-import KDBush from 'kdbush';
 
 type CombinedScooter = Scooter & {
     providerIdentifier: string,

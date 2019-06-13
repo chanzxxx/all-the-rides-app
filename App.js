@@ -18,12 +18,14 @@ import {CombinedScooterStore} from "./stores/CombinedScooterStore";
 import {XingxingScooterStore} from "./stores/XingxingScooterStore";
 import {SpatialIndexStore} from "./stores/SpatialIndexStore";
 import {observable, action} from "mobx";
+import {SwingScooterStore} from "./stores/SwingScooterStore";
 
 
 const kickgoingScooterStore = new KickgoingScooterStore();
 const gogoxingScooterStore = new GogoxingScooterStore();
 const xingxingScooterStore = new XingxingScooterStore();
-const combinedScooterStore = new CombinedScooterStore(kickgoingScooterStore, gogoxingScooterStore, xingxingScooterStore);
+const swingScooterStore = new SwingScooterStore();
+const combinedScooterStore = new CombinedScooterStore(kickgoingScooterStore, gogoxingScooterStore, xingxingScooterStore, swingScooterStore);
 const spatialIndexStore = new SpatialIndexStore(combinedScooterStore);
 
 type Props = {};
@@ -58,6 +60,7 @@ class App extends Component<Props> {
                   kickgoingScooterStore={kickgoingScooterStore}
                   gogoxingScooterStore={gogoxingScooterStore}
                   xingxingScooterStore={xingxingScooterStore}
+                  swingScooterStore={swingScooterStore}
                   spatialIndexStore={spatialIndexStore}>
           <SideMenu menu={(<InnerSideMenu/>)}
                     isOpen={this.isMenuOpen}

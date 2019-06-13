@@ -12,6 +12,7 @@ import {CombinedScooterStore} from "./stores/CombinedScooterStore";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
 import {XingxingScooterStore} from "./stores/XingxingScooterStore";
+import {SwingScooterStore} from "./stores/SwingScooterStore";
 import {SpatialIndexStore} from "./stores/SpatialIndexStore";
 
 type Props = {
@@ -19,6 +20,7 @@ type Props = {
     kickgoingScooterStore: KickgoingScooterStore,
     gogoxingScooterStore: GogoxingScooterStore,
     xingxingScooterStore: XingxingScooterStore,
+    swingScooterStore: SwingScooterStore,
     spatialIndexStore: SpatialIndexStore,
 };
 
@@ -55,7 +57,14 @@ const styles = StyleSheet.create({
     }
 });
 
-@inject('combinedScooterStore', 'kickgoingScooterStore', 'gogoxingScooterStore', 'xingxingScooterStore', 'spatialIndexStore')
+@inject(
+    'combinedScooterStore',
+    'kickgoingScooterStore',
+    'gogoxingScooterStore',
+    'xingxingScooterStore',
+    'swingScooterStore',
+    'spatialIndexStore'
+)
 @observer
 class Map extends React.Component<Props> {
     @observable showMap = false;
@@ -160,6 +169,7 @@ class Map extends React.Component<Props> {
             console.log('camera', camera);
             this.props.kickgoingScooterStore.fetch(camera.center.latitude, camera.center.longitude, camera.zoom);
             this.props.xingxingScooterStore.fetch(camera.center.latitude, camera.center.longitude, camera.zoom);
+            this.props.swingScooterStore.fetch(camera.center.latitude, camera.center.longitude, camera.zoom);
         });
 
         this.mapView.getMapBoundaries().then(boundaries => {
