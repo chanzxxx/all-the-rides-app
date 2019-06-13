@@ -127,7 +127,7 @@ class Map extends React.Component<Props> {
         Geolocation.watchPosition((coord) => {
             console.log('watchPos', coord);
 
-            if (!this.mapView && !this.initialCamera) {
+            if (!this.mapView || !this.initialCamera) {
                 this.setInitialCameraObject({
                     center: {
                         latitude: coord.coords.latitude,
