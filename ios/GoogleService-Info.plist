@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>820315430597-3dramqsmre12rn9r1icja2nofbqcrkhq.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.820315430597-3dramqsmre12rn9r1icja2nofbqcrkhq</string>
+	<key>API_KEY</key>
+	<string>AIzaSyCBVlhzLgcGRoM26AFna2tqJl1SAWVQm40</string>
+	<key>GCM_SENDER_ID</key>
+	<string>820315430597</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.alltherides</string>
+	<key>PROJECT_ID</key>
+	<string>rides-243000</string>
+	<key>STORAGE_BUCKET</key>
+	<string>rides-243000.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:820315430597:ios:479de9e6e23dd6a6</string>
+	<key>DATABASE_URL</key>
+	<string>https://rides-243000.firebaseio.com</string>
+</dict>
+</plist>
