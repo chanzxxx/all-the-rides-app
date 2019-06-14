@@ -122,6 +122,8 @@ class Map extends React.Component<Props> {
             } else {
                 this.setShowMap(true);
             }
+        } else {
+            // todo: check permission in iOS
         }
 
         Geolocation.watchPosition((coord) => {
