@@ -7,10 +7,10 @@
  */
 
 import React, {Component} from 'react';
-import {StyleSheet, View, Text, TouchableOpacity, Image} from 'react-native';
+import {StyleSheet, View, Text, TouchableOpacity, Image, SafeAreaView, StatusBar} from 'react-native';
 import Map from './Map';
 import {InnerSideMenu} from "./components/InnerSideMenu";
-import SideMenu from 'react-native-side-menu';
+import SideMenu from './components/SideMenu';
 import {observer, Provider} from "mobx-react";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
@@ -59,6 +59,8 @@ class App extends Component<Props> {
 
   render() {
     return (
+      <SafeAreaView style={styles.safeArea}>
+      <StatusBar backgroundColor="#253746" barStyle="light-content" />
         <Provider combinedScooterStore={combinedScooterStore}
                   kickgoingScooterStore={kickgoingScooterStore}
                   gogoxingScooterStore={gogoxingScooterStore}
@@ -86,11 +88,17 @@ class App extends Component<Props> {
             </View>
           </SideMenu>
         </Provider>
+      </SafeAreaView>
     );
   }
 }
 
 const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: '#253746',
+    color: '#ffffff'
+  },
   appContainer: {
     flex: 1,
     display: 'flex',
