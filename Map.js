@@ -14,6 +14,7 @@ import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
 import {XingxingScooterStore} from "./stores/XingxingScooterStore";
 import {SwingScooterStore} from "./stores/SwingScooterStore";
 import {SpatialIndexStore} from "./stores/SpatialIndexStore";
+import {crashlytics} from 'react-native-firebase';
 
 type Props = {
     combinedScooterStore: CombinedScooterStore,

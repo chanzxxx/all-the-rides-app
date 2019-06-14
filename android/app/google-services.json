@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "820315430597",
+    "firebase_url": "https://rides-243000.firebaseio.com",
+    "project_id": "rides-243000",
+    "storage_bucket": "rides-243000.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820315430597:android:479de9e6e23dd6a6",
+        "android_client_info": {
+          "package_name": "com.alltherides"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "820315430597-bq76afrlk7ir9uhhcatnikhoajinljf8.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnDOL-t5de8th5-Hfl9q-qEgaVKw3LgsM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820315430597-bq76afrlk7ir9uhhcatnikhoajinljf8.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
