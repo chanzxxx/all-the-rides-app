@@ -123,8 +123,6 @@ class Map extends React.Component<Props> {
             } else {
                 this.setShowMap(true);
             }
-        } else {
-            this.setShowMap(true);
         }
 
         Geolocation.watchPosition((coord) => {
@@ -139,6 +137,10 @@ class Map extends React.Component<Props> {
                     pitch: 0,
                     zoom: 18,
                 });
+
+                if (Platform.OS === 'ios') {
+                    this.setShowMap(true);
+                }
 
                 return;
             }
@@ -163,8 +165,8 @@ class Map extends React.Component<Props> {
         });
     }
 
-    componentWillUmmount() {
-        // Geolocation.clearWatch();
+    componentWillUnmount() {
+        Geolocation.clearWatch();
     }
 
     fetch = () => {
