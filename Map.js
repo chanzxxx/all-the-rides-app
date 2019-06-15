@@ -136,6 +136,7 @@ class Map extends React.Component<Props> {
                     },
                     pitch: 0,
                     zoom: 18,
+                    heading: 0,
                 });
 
                 if (Platform.OS === 'ios') {
@@ -237,13 +238,27 @@ class Map extends React.Component<Props> {
         Geolocation.getCurrentPosition(pos => {
             console.log('pos', pos);
             console.log('this.mapView', this.mapView);
-            this.mapView.setCamera({
-                center: {
-                    latitude: pos.coords.latitude,
-                    longitude: pos.coords.longitude,
-                },
-                zoom: 18 // initial zoom level
-            });
+
+            if (Platform.OS === 'android') {
+                this.mapView.setCamera({
+                    center: {
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude,
+                    },
+                    heading: 0,
+                    zoom: 18 // initial zoom level
+                });
+            } else {
+                this.mapView.setCamera({
+                    center: {
+                        latitude: pos.coords.latitude,
+                        longitude: pos.coords.longitude
+                    },
+                    altitude: pos.coords.altitude,
+                    heading: pos.coords.heading
+                })
+            }
+
         });
     }
 
