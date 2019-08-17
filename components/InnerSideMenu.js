@@ -1,6 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet, Image, TouchableOpacity, Platform, Linking} from 'react-native';
-import {inject} from "mobx-react";
+import {inject} from "mobx-react/native";
 import {CombinedScooterStore} from "../stores/CombinedScooterStore";
 import type {AndroidAppInfo, AppInfo} from "../stores/ScooterStoreInterface";
 import SendIntentAndroid from 'react-native-send-intent';

@@ -11,7 +11,7 @@ import {StyleSheet, View, Text, TouchableOpacity, Image, SafeAreaView, StatusBar
 import Map from './Map';
 import {InnerSideMenu} from "./components/InnerSideMenu";
 import SideMenu from './components/SideMenu';
-import {observer, Provider} from "mobx-react";
+import {observer, Provider} from "mobx-react/native";
 import {KickgoingScooterStore} from "./stores/KickgoingScooterStore";
 import {GogoxingScooterStore} from "./stores/GogoxingScooterStore";
 import {CombinedScooterStore} from "./stores/CombinedScooterStore";

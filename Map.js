@@ -5,7 +5,7 @@
 import React from 'react';
 import {StyleSheet, View, TouchableOpacity, Text, Platform, PermissionsAndroid, Image, ActivityIndicator} from 'react-native';
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
-import {inject, observer} from "mobx-react";
+import {inject, observer} from "mobx-react/native";
 import {observable, action} from "mobx";
 import Geolocation from 'react-native-geolocation-service';
 import {CombinedScooterStore} from "./stores/CombinedScooterStore";
