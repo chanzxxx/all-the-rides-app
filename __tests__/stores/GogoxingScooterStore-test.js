@@ -1,11 +1,6 @@
 import {GogoxingScooterStore} from "../../stores/GogoxingScooterStore";
 require('react-native/Libraries/Core/setUpXHR');
 
-// import {polyfillGlobal} from 'react-native/Libraries/Utilities/PolyfillFunctions';
-//
-// polyfillGlobal('XMLHttpRequest', () => require('react-native/Libraries/Network/XMLHttpRequest'));
-// polyfillGlobal('FormData', () => require('react-native/Libraries/Network/FormData'));
-
 describe('GogoxingScooterStore', () => {
     let store: GogoxingScooterStore = null;
 

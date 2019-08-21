@@ -33,6 +33,10 @@ export class XingxingScooterStore implements ScooterStoreInterface {
                 serialNumber: raw._id,
                 batteryLevel: raw.deviceStatus.battery
             })));
+
+            return true;
+        }).catch(error => {
+            return false;
         }).finally(() => {
             this.setFetching(false);
         });

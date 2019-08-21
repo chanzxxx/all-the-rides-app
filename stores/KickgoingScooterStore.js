@@ -40,6 +40,9 @@ export class KickgoingScooterStore implements ScooterStoreInterface {
                 lng: item.lng,
                 // id: item.id
             })));
+            return true;
+        }).catch(error => {
+            return false;
         }).finally(() => {
             this.setFetching(false);
         });

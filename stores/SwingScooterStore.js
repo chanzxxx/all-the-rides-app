@@ -30,6 +30,9 @@ export class SwingScooterStore implements ScooterStoreInterface {
                 serialNumber: item.imei,
                 batteryLevel: null
             })));
+            return true;
+        }).catch(error => {
+            return false;
         }).finally(() => {
             this.setFetching(false);
         });
